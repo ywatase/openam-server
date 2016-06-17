@@ -1,0 +1,81 @@
+---
+
+# OpenAM
+- name: check OpenAM installed
+  stat:
+    path=/var/www/gmo/tomcat/webapps/openam.war
+  register: f
+
+- name: copy OpenAM war
+  copy:
+    src=download/OpenAM-13.0.0.war
+    dest=/var/www/gmo/tomcat/webapps/openam.war
+
+- name: restart tomcat
+  service:
+    name=tomcat
+    state=restarted
+  become: yes
+  become_user: root
+
+# configurator
+- name: check configurator installed
+  stat:
+    path=/opt/openam-tools/config
+  register: f
+
+- name: create configurator install directory
+  file:
+    path=/opt/openam-tools/config
+    state=directory
+    mode=777
+  when: f.stat.exists == False
+
+- name: unarchive configurator
+  unarchive:
+    src=download/SSOConfiguratorTools-13.0.0.zip
+    dest=/opt/openam-tools/config
+  when: f.stat.exists == False
+
+- name: copy config.properties
+  template:
+    src=config.properties.j2
+    dest=/opt/openam-tools/config/config.properties
+    mode=644
+
+- name: default configuration
+  command:
+    java -jar openam-configurator-tool-13.0.0.jar --file config.properties
+    chdir=/opt/openam-tools/config
+
+# ssoadm
+- name: check ssoadm installed
+  stat: path=/opt/openam-tools/admin
+  register: f
+
+- name: create ssoadm install directory
+  file:
+    path=/opt/openam-tools/admin
+    state=directory
+    mode=777
+  when: f.stat.exists == False
+
+- name: unarchive ssoadmin
+  unarchive:
+    src=download/SSOAdminTools-13.0.0.zip
+    dest=/opt/openam-tools/admin
+  when: f.stat.exists == False
+
+- name: create openam config directory
+  file:
+    path=/etc/openam state=directory
+    mode=777
+
+- name: setup ssoadmin
+  command: ./setup \
+    --acceptLicense \
+    --path /etc/openam \
+    --log /opt/openam-tools/admin/log
+    chdir=/opt/openam-tools/admin
+  environment:
+    JAVA_HOME: "/usr/java/jdk1.8.0_77"

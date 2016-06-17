@@ -1,0 +1,18 @@
+# local OpenAM
+- hosts:
+    - local_openam
+  become: yes
+  remote_user: vagrant
+  roles:
+    - ywatase.repo-epel
+    - ywatase.repo-remi
+    - williamyeh.oracle-java
+      #    - app.tomcat
+
+# local web
+- hosts:
+    - local_web
+  become: yes
+  remote_user: vagrant
+  roles:
+    - geerlingguy.apache

@@ -1,0 +1,7 @@
+---
+- src: https://github.com/ywatase/repo-epel
+  name: ywatase.repo-epel
+- src: https://github.com/ywatase/repo-remi
+  name: ywatase.repo-remi
+- src: williamyeh.oracle-java
+- src: geerlingguy.apache

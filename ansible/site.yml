@@ -1,0 +1,15 @@
+# local OpenAM server
+- hosts:
+    - local_openam
+  remote_user: vagrant
+  roles:
+    - app.openam-setup
+    - app.openam-configuration
+ 
+# local web
+- hosts:
+    - local_web
+  remote_user: vagrant
+  roles:
+    - app.apache-agent
+
